@@ -514,10 +514,17 @@ class RustAnalyzer(SolidLanguageServer):
                 "assist": {"emitMustUse": False, "expressionFillDefault": "todo"},
                 # Eager cache priming and automatic Cargo reloads can repeatedly
                 # index large, actively-built workspaces. Keep checkOnSave enabled
-                # because Rust diagnostics rely on flycheck.
+                # because Rust diagnostics rely on flycheck, but set check.workspace
+                # to False: rust-analyzer schedules a whole-workspace flycheck
+                # (`cargo check --workspace --all-targets`) as soon as the workspace
+                # is loaded when BOTH checkOnSave and check.workspace are true, which
+                # pegs the CPU on a large workspace at every MCP start. With
+                # check.workspace=False that startup check is skipped and the
+                # didSave-triggered check runs `cargo check -p <package>` for the
+                # saved file's package only.
                 "cachePriming": {"enable": False, "numThreads": 0},
                 "cargo": {
-                    "autoreload": True,
+                    "autoreload": False,
                     "buildScripts": {
                         "enable": True,
                         "invocationLocation": "workspace",
@@ -539,6 +546,7 @@ class RustAnalyzer(SolidLanguageServer):
                 "check": {
                     "allTargets": True,
                     "command": "check",
+                    "workspace": False,
                     "extraArgs": [],
                     "extraEnv": {},
                     "features": None,

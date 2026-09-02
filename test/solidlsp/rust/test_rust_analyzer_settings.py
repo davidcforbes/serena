@@ -18,7 +18,12 @@ def test_initialization_uses_lightweight_indexing_settings() -> None:
     initialization_options = _make_server()._create_base_initialize_params()["initializationOptions"]
 
     assert initialization_options["cachePriming"]["enable"] is False
+    assert initialization_options["cargo"]["autoreload"] is False
     assert initialization_options["checkOnSave"] is True
+    # check.workspace=False stops the whole-workspace flycheck rust-analyzer schedules once the
+    # workspace is loaded (main_loop quiescence is gated on check_on_save && flycheck_workspace)
+    # and scopes the didSave-triggered check to the saved file's package (`cargo check -p`).
+    assert initialization_options["check"]["workspace"] is False
 
 
 @pytest.mark.parametrize("pull_diagnostics_failed", [False, True])
