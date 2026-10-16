@@ -1,7 +1,15 @@
 # Bug report draft — rust-analyzer unbounded memory (40+ GB) on large Rust workspaces
 
-> Draft for an upstream issue/PR to oraios/serena. The fix is the companion
-> commit on this branch (`rustback/lightweight-rust-analyzer`).
+> **Status 2026-10-16:** upstream merged the `cachePriming` part of this fix
+> (`3be211c6`, 2026-06-08) and then re-enabled `cargo.autoreload`
+> (`1f133f62`, 2026-07-29). The local fix therefore still lives as a commit on
+> `local/main`, rebased onto upstream `main`: "rust-analyzer: skip the
+> whole-workspace startup flycheck". It sets `cargo.autoreload=False` and
+> `check.workspace=False`, and `test/solidlsp/rust/test_rust_analyzer_settings.py`
+> asserts both. The branch named below no longer exists.
+>
+> Original note: draft for an upstream issue/PR to oraios/serena. The fix is the
+> companion commit on this branch (`rustback/lightweight-rust-analyzer`).
 
 ## Summary
 
