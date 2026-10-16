@@ -8,17 +8,21 @@ Make sure that you read the project's `critical_info` memory before working on i
 
 ## Local Serena CLI and Codex
 
-On this Windows workstation, use the repository virtual environment as the
-canonical Serena runtime. Do not install `serena-agent` with `uv tool`.
+On this Windows workstation, the canonical Serena runtime is the `uv tool`
+install of `serena-agent` from this repository. Do not use the repository
+`.venv` (if present) as the runtime; it exists only for running tests.
 
-- `C:\Users\david\bin\serena.exe` must be a copy of
-  `C:\dev\serena\.venv\Scripts\serena.exe`. Refresh the copy after recreating
-  `.venv` or regenerating its entrypoints.
-- Configure the Codex MCP server named `serena` to run
-  `C:\dev\serena\.venv\Scripts\serena.exe` with `start-mcp-server`,
-  `--project-from-cwd`, and `--context=codex`.
+- Entry point: `C:\Users\david\.local\bin\serena.exe` (shim managed by `uv tool`).
+- After changing Serena code in this repo, reinstall the tool so the shim runs
+  the new code, e.g. `uv tool install --force -e .` (or reinstall
+  `serena-agent`). Newly started MCP servers pick up the new code immediately;
+  already-running servers keep the old code in memory until the client restarts.
+- Codex MCP server named `serena` in `C:\Users\david\.codex\config.toml` runs
+  `C:/Users/david/.local/bin/serena.exe` with `start-mcp-server`,
+  `--context=codex`, and `--project-from-cwd`.
 - Preserve `PYTHONUTF8=1`, `PYTHONIOENCODING=utf-8`, and
-  `startup_timeout_sec = 60` in the Codex MCP configuration.
+  `startup_timeout_sec = 90` in that configuration. The current 90 s headroom
+  covers slow first starts right after a tool reinstall.
 - Verify from a different repository with `serena --version` and
-  `codex mcp get serena --json`. Restart open Codex clients after changing the
-  runtime or MCP configuration.
+  `codex mcp get serena --json`. Restart open Codex/Claude clients after
+  changing the runtime or MCP configuration.
